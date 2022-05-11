@@ -1,4 +1,4 @@
-import 'package:casino_test/src/data/models/character.dart';
+import 'package:casino_test/src/data/models/character_result.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class MainPageEvent extends Equatable {
@@ -9,12 +9,12 @@ abstract class MainPageEvent extends Equatable {
 }
 
 class GetTestDataOnMainPageEvent extends MainPageEvent {
-  final int page;
+  final String? url;
 
-  const GetTestDataOnMainPageEvent(this.page);
+  const GetTestDataOnMainPageEvent({this.url});
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [url];
 }
 
 class LoadingDataOnMainPageEvent extends MainPageEvent {
@@ -25,10 +25,10 @@ class LoadingDataOnMainPageEvent extends MainPageEvent {
 }
 
 class DataLoadedOnMainPageEvent extends MainPageEvent {
-  final List<Character>? characters;
+  final CharacterResult? characterResult;
 
-  const DataLoadedOnMainPageEvent(this.characters);
+  const DataLoadedOnMainPageEvent(this.characterResult);
 
   @override
-  List<Object?> get props => [characters];
+  List<Object?> get props => [characterResult];
 }

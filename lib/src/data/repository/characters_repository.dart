@@ -1,5 +1,5 @@
-import 'package:casino_test/src/data/models/character.dart';
+import 'package:casino_test/src/data/models/character_result.dart';
 
 abstract class CharactersRepository {
-  Future<List<Character>?> getCharacters(int page);
+  Future<CharacterResult?> getCharacters({String? nextUrl});
 }

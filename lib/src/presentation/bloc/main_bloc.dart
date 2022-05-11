@@ -1,10 +1,10 @@
+import 'package:casino_test/src/data/models/character.dart';
 import 'package:casino_test/src/data/repository/characters_repository.dart';
 import 'package:casino_test/src/presentation/bloc/main_event.dart';
 import 'package:casino_test/src/presentation/bloc/main_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class MainPageBloc
-    extends Bloc<MainPageEvent, MainPageState> {
+class MainPageBloc extends Bloc<MainPageEvent, MainPageState> {
   final CharactersRepository _charactersRepository;
 
   MainPageBloc(
@@ -26,8 +26,17 @@ class MainPageBloc
     DataLoadedOnMainPageEvent event,
     Emitter<MainPageState> emit,
   ) async {
-    if (event.characters == null) {
-      emit(SuccessfulMainPageState(event.characters!));
+    if (event.characterResult != null) {
+      if (state is SuccessfulMainPageState && event.characterResult != null) {
+        final newCharacters = (state as SuccessfulMainPageState).characterResult.results ?? [];
+        newCharacters.addAll(event.characterResult?.results ?? []);
+        final newCharacterResult = event.characterResult!.copyWith(
+          results: List<Character>.from(newCharacters),
+        );
+        emit(SuccessfulMainPageState(newCharacterResult));
+      } else {
+        emit(SuccessfulMainPageState(event.characterResult!));
+      }
     } else {
       emit(UnSuccessfulMainPageState());
     }
@@ -37,10 +46,10 @@ class MainPageBloc
     GetTestDataOnMainPageEvent event,
     Emitter<MainPageState> emit,
   ) async {
-    _charactersRepository.getCharacters(event.page).then(
-      (value) {
-        add(DataLoadedOnMainPageEvent(value));
-      },
+    emit(LoadingMainPageState());
+    final result = await _charactersRepository.getCharacters(
+      nextUrl: event.url,
     );
+    add(DataLoadedOnMainPageEvent(result));
   }
 }

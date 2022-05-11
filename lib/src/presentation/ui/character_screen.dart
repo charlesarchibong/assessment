@@ -16,20 +16,32 @@ class CharactersScreen extends StatelessWidget {
         create: (context) => MainPageBloc(
           InitialMainPageState(),
           GetIt.I.get<CharactersRepository>(),
-        )..add(const GetTestDataOnMainPageEvent(1)),
-        child: BlocConsumer<MainPageBloc, MainPageState>(
-          listener: (context, state) {},
-          builder: (blocContext, state) {
-            if (state is LoadingMainPageState) {
-              return _loadingWidget(context);
-            } else if (state is SuccessfulMainPageState) {
-              return _successfulWidget(context, state);
-            } else {
-              return Center(child: const Text("error"));
-            }
-          },
-        ),
+        )..add(const GetTestDataOnMainPageEvent()),
+        child: CharacterWidget(),
       ),
+    );
+  }
+}
+
+class CharacterWidget extends StatelessWidget {
+  const CharacterWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<MainPageBloc, MainPageState>(
+      builder: (blocContext, state) {
+        if (state is LoadingMainPageState) {
+          return _loadingWidget(context);
+        } else if (state is SuccessfulMainPageState) {
+          return _successfulWidget(context, state);
+        } else if (state is UnSuccessfulMainPageState) {
+          return const Center(
+            child: Text("error"),
+          );
+        } else {
+          return const SizedBox();
+        }
+      },
     );
   }
 
@@ -47,13 +59,12 @@ class CharactersScreen extends StatelessWidget {
     );
   }
 
-  Widget _successfulWidget(
-      BuildContext context, SuccessfulMainPageState state) {
+  Widget _successfulWidget(BuildContext context, SuccessfulMainPageState state) {
     return ListView.builder(
       cacheExtent: double.infinity,
-      itemCount: state.characters.length,
+      itemCount: state.characterResult.results!.length,
       itemBuilder: (context, index) {
-        return _characterWidget(context, state.characters[index]);
+        return _characterWidget(context, state.characterResult.results![index]);
       },
     );
   }
@@ -74,14 +85,25 @@ class CharactersScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(2.0),
-              child: Text(character.name),
-            ),
-            Image.network(
-              character.image,
-              width: 50,
-              height: 50,
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Image.network(
+                  character.image,
+                  width: 50,
+                  height: 50,
+                ),
+                SizedBox(width: 10),
+                Expanded(
+                    child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(character.name),
+                    Text(character.species),
+                    Text(character.gender),
+                  ],
+                ))
+              ],
             ),
           ],
         ),
