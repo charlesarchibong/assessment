@@ -1,21 +1,22 @@
 # casino_test
 
-Casino test Flutter application.
+Test Task: Online Casino Flutter application.
 
-This is app to explore all characters in Rick and Morty movie.
+Do you remember Rick and Morty cartoon? 
+Your goal is to create the app with all the characters from this cartoon, and make it look juicy.
 
 API docs: https://rickandmortyapi.com/documentation
 
-##Todo:
-- fix loading state
-- fix fetching data logic
-- find and fix all other issues
-- add more information about characters
-- optimize scrolling performance
-- implement pagination
+##To-do:
+
+- Fix loading state and fetching data logic
+- Find and fix all other issues
+- Add more information about characters
+- Optimize scrolling performance
+- Implement pagination
 
 #Optional:
-- add infinite scrolling pagination
+- Add infinite scrolling pagination
 
-#Comments:
-You need to use same libraries, but you can also add more(reasonably).
+#PS:
+You need to use same libraries, but you can also add more (reasonable amount).

@@ -7,11 +7,17 @@ part of 'character.dart';
 // **************************************************************************
 
 Character _$CharacterFromJson(Map<String, dynamic> json) => Character(
-      json['name'] as String,
-      json['i'] as String,
+      name: json['name'] as String,
+      image: json['image'] as String,
+      status: json['status'] as String,
+      species: json['species'] as String,
+      gender: json['gender'] as String,
     );
 
 Map<String, dynamic> _$CharacterToJson(Character instance) => <String, dynamic>{
       'name': instance.name,
       'image': instance.image,
+      'status': instance.status,
+      'species': instance.species,
+      'gender': instance.gender,
     };
