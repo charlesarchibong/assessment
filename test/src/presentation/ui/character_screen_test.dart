@@ -65,7 +65,27 @@ void main() {
             prev: null,
           ),
           results: [
-            Character(gender: 'Male', image: '', name: 'Charles', species: 'Robot', status: 'unknown'),
+            Character(
+              gender: 'Male',
+              image: '',
+              name: 'Charles',
+              species: 'Robot',
+              status: 'unknown',
+            ),
+            Character(
+              gender: 'Male',
+              image: '',
+              name: 'Charles',
+              species: 'Robot',
+              status: 'unknown',
+            ),
+            Character(
+              gender: 'Male',
+              image: '',
+              name: 'Charles',
+              species: 'Robot',
+              status: 'unknown',
+            ),
           ],
         ),
       );
