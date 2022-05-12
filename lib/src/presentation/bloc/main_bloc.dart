@@ -17,9 +17,6 @@ class MainPageBloc extends Bloc<MainPageEvent, MainPageState> {
     on<DataLoadedOnMainPageEvent>(
       (event, emitter) => _dataLoadedOnMainPageCasino(event, emitter),
     );
-    on<LoadingDataOnMainPageEvent>(
-      (event, emitter) => emitter(LoadingMainPageState()),
-    );
   }
 
   Future<void> _dataLoadedOnMainPageCasino(
