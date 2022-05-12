@@ -38,7 +38,10 @@ class MainPageBloc extends Bloc<MainPageEvent, MainPageState> {
         emit(SuccessfulMainPageState(event.characterResult!));
       }
     } else {
-      emit(UnSuccessfulMainPageState());
+      //This is to prvent the error when the data is loaded at first time (for pagination)
+      if (!(state is SuccessfulMainPageState)) {
+        emit(UnSuccessfulMainPageState());
+      }
     }
   }
 
@@ -46,7 +49,10 @@ class MainPageBloc extends Bloc<MainPageEvent, MainPageState> {
     GetTestDataOnMainPageEvent event,
     Emitter<MainPageState> emit,
   ) async {
-    emit(LoadingMainPageState());
+    //emit loading state only when page is initial
+    if (event.url == null) {
+      emit(LoadingMainPageState());
+    }
     final result = await _charactersRepository.getCharacters(
       nextUrl: event.url,
     );

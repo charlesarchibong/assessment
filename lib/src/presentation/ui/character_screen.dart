@@ -1,8 +1,13 @@
+import 'dart:developer';
+
+import 'package:casino_test/core/test/test_util.dart';
 import 'package:casino_test/src/data/models/character.dart';
 import 'package:casino_test/src/data/repository/characters_repository.dart';
 import 'package:casino_test/src/presentation/bloc/main_bloc.dart';
 import 'package:casino_test/src/presentation/bloc/main_event.dart';
 import 'package:casino_test/src/presentation/bloc/main_state.dart';
+import 'package:casino_test/src/presentation/ui/widget/safe_image.dart';
+import 'package:casino_test/src/presentation/ui/widget/safe_progress_indication_factory.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
@@ -11,37 +16,71 @@ import 'package:get_it/get_it.dart';
 class CharactersScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: BlocProvider(
-        create: (context) => MainPageBloc(
-          InitialMainPageState(),
-          GetIt.I.get<CharactersRepository>(),
-        )..add(const GetTestDataOnMainPageEvent()),
-        child: CharacterWidget(),
-      ),
+    return BlocProvider(
+      create: (context) => MainPageBloc(
+        InitialMainPageState(),
+        GetIt.I.get<CharactersRepository>(),
+      )..add(const GetTestDataOnMainPageEvent()),
+      child: CharacterWidget(),
     );
   }
 }
 
-class CharacterWidget extends StatelessWidget {
+class CharacterWidget extends StatefulWidget {
   const CharacterWidget({Key? key}) : super(key: key);
 
   @override
+  State<CharacterWidget> createState() => _CharacterWidgetState();
+}
+
+class _CharacterWidgetState extends State<CharacterWidget> {
+  late final ScrollController _scrollController;
+
+  void _scrollingListener() {
+    if (_scrollController.offset >= (_scrollController.position.maxScrollExtent - 200)) {
+      final mainPageState = context.read<MainPageBloc>().state;
+      if (mainPageState is SuccessfulMainPageState && mainPageState.characterResult.info.next != null) {
+        log("fetching new data");
+        context.read<MainPageBloc>().add(
+              GetTestDataOnMainPageEvent(
+                url: mainPageState.characterResult.info.next,
+              ),
+            );
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_scrollingListener);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _scrollController.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return BlocBuilder<MainPageBloc, MainPageState>(
-      builder: (blocContext, state) {
-        if (state is LoadingMainPageState) {
-          return _loadingWidget(context);
-        } else if (state is SuccessfulMainPageState) {
-          return _successfulWidget(context, state);
-        } else if (state is UnSuccessfulMainPageState) {
-          return const Center(
-            child: Text("error"),
-          );
-        } else {
-          return const SizedBox();
-        }
-      },
+    return Scaffold(
+      body: BlocBuilder<MainPageBloc, MainPageState>(
+        builder: (blocContext, state) {
+          if (state is LoadingMainPageState) {
+            return _loadingWidget(context);
+          } else if (state is SuccessfulMainPageState) {
+            return _successfulWidget(context, state);
+          } else if (state is UnSuccessfulMainPageState) {
+            return const Center(
+              child: Text("error"),
+            );
+          } else {
+            return const SizedBox();
+          }
+        },
+      ),
     );
   }
 
@@ -50,19 +89,15 @@ class CharacterWidget extends StatelessWidget {
       child: Container(
         width: 50,
         height: 50,
-        margin: EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          borderRadius: const BorderRadius.all(Radius.circular(12)),
-        ),
-        child: const CircularProgressIndicator(),
+        child: SafeProgressIndicatorFactory.adaptive(),
       ),
     );
   }
 
   Widget _successfulWidget(BuildContext context, SuccessfulMainPageState state) {
     return ListView.builder(
-      cacheExtent: double.infinity,
       itemCount: state.characterResult.results!.length,
+      controller: _scrollController,
       itemBuilder: (context, index) {
         return _characterWidget(context, state.characterResult.results![index]);
       },
@@ -72,7 +107,7 @@ class CharacterWidget extends StatelessWidget {
   Widget _characterWidget(BuildContext context, Character character) {
     return Container(
       alignment: Alignment.topLeft,
-      padding: EdgeInsets.all(8),
+      padding: const EdgeInsets.all(8),
       child: Container(
         padding: const EdgeInsets.all(16),
         width: double.infinity,
@@ -88,12 +123,10 @@ class CharacterWidget extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Image.network(
-                  character.image,
-                  width: 50,
-                  height: 50,
+                SafeImage(
+                  url: TestUtil.isTest ? null : character.image,
                 ),
-                SizedBox(width: 10),
+                const SizedBox(width: 10),
                 Expanded(
                     child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
